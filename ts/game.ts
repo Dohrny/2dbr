@@ -47,7 +47,7 @@ function create() {
     layer.resizeWorld()
     //ok map stuff ends
 
-    player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite
+    player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
     game.physics.arcade.enable(player) //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true //collides with edge of the world
     player.anchor.set(0.5) //mouse aim is now from center of sprite, instead of 0,0
