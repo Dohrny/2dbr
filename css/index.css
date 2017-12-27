@@ -1,0 +1,9 @@
+body {
+    background-color: lightgray;
+}
+
+#game {
+    display: block;
+    margin: auto;
+    width: 50%;
+}
