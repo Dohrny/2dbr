@@ -13,7 +13,7 @@ app.get('/',function(req,res){
 });
 
 io.on('connection', function(socket) {
-    console.log('oioioioioioi')
+    console.log('user connected...id: ' + socket.id)
     socket.on('disconnect', function() {
         console.log('user disconnected')
     })
