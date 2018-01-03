@@ -7,7 +7,8 @@
     },
     "files": [
         "node_modules/phaser-ce/typescript/phaser.d.ts",
-        "node_modules/phaser-ce/typescript/pixi.d.ts"
+        "node_modules/phaser-ce/typescript/pixi.d.ts",
+        "node_modules/@types/socket.io/index.d.ts"
     ],
     "include": [
         "ts/**/*.ts"

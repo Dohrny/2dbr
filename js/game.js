@@ -5,7 +5,7 @@ var game = new Phaser.Game(720, 720, Phaser.AUTO, 'game', {
     preload: preload, create: create, update: update,
     render: render
 });
-export { game };
+//export { game }
 function preload() {
     game.load.image('guy', '/assets/player.png');
     game.load.image('bullet', '/assets/bullet.png');
@@ -81,7 +81,6 @@ function update() {
         player.y -= moveSpeed * game.time.physicsElapsed;
     }
     player.rotation = game.physics.arcade.angleToPointer(player); //player sprite rotates towards mouse pointer
-    //game.input.activePointer.leftButton.onDown.add(pistol.fire)
     if (game.input.activePointer.leftButton.isDown) {
         if (equippedWeapon == 'pistol') {
             pistol.fire();

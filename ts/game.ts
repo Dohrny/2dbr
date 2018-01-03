@@ -1,4 +1,5 @@
-import { Sprite, Group, Weapon, Pointer, Tilemap, Tileset, TilemapLayer, Time, Game, PluginManager } from "phaser-ce";
+import { Sprite, Group, Weapon, Pointer, Tilemap, Tileset,
+     TilemapLayer, Time, Game, PluginManager, Input, Mouse } from "phaser-ce";
 //import { Pistol } from "./pistol";
 /// // <reference path='pistol.ts' />
 var socket = io.connect()
@@ -7,7 +8,7 @@ var game = new Phaser.Game(720, 720, Phaser.AUTO, 'game', {
     preload: preload, create: create, update: update,
     render: render
 })  
-export { game }
+//export { game }
 function preload() {
     game.load.image('guy', '/assets/player.png')
     game.load.image('bullet', '/assets/bullet.png')
@@ -94,7 +95,6 @@ function update() {
     }
     player.rotation = game.physics.arcade.angleToPointer(player) //player sprite rotates towards mouse pointer
 
-    //game.input.activePointer.leftButton.onDown.add(pistol.fire)
     if (game.input.activePointer.leftButton.isDown) {
         if (equippedWeapon == 'pistol') {
             pistol.fire()
@@ -103,6 +103,7 @@ function update() {
             shotgun.fireMany(shotgunSpread)
         }
     }
+
     if (game.input.keyboard.isDown(Phaser.Keyboard.Z)) {
         equippedWeapon = 'pistol'
     } else if (game.input.keyboard.isDown(Phaser.Keyboard.X)) {
