@@ -1,1 +1,0 @@
-//# sourceMappingURL=pistol.js.map

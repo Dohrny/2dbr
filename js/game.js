@@ -1,15 +1,13 @@
-//import { Pistol } from "./pistol";
-/// // <reference path='pistol.ts' />
-var socket = io.connect();
 var game = new Phaser.Game(720, 720, Phaser.AUTO, 'game', {
     preload: preload, create: create, update: update,
     render: render
 });
-//export { game }
 function preload() {
     game.load.image('guy', '/assets/player.png');
     game.load.image('bullet', '/assets/bullet.png');
-    game.load.image('tiles', 'assets/tilesets/background.png');
+    game.load.tilemap('map', '/assets/tilemaps/map.json', null, Phaser.Tilemap.TILED_JSON);
+    game.load.image('tiles', '/assets/tilemaps/tiles/background.png');
+    game.load.image('greenWall', '/assets/tilemaps/tiles/greenWall.png');
 }
 var player;
 var moveSpeed = 180;
@@ -18,33 +16,24 @@ var shotgun;
 var shotgunSpread;
 var equippedWeapon;
 var map;
-var ground;
-var layer;
+var groundLayer;
+var wallLayer;
+var objectLayer;
 function create() {
-    //socket.io stuff
-    socket.on('connect', onSocketConnected);
     game.physics.startSystem(Phaser.Physics.ARCADE); //enable physics
     game.time.advancedTiming = true; //so i can show fps in debug
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }; //stops right-click from showing context menu
-    //map stuff starts here
-    var data = '';
-    for (let y = 0; y < 5; y++) {
-        for (let x = 0; x < 5; x++) {
-            data += '0';
-            if (x < 4) {
-                data += ',';
-            }
-        }
-        if (y < 4) {
-            data += '\n';
-        }
-    }
-    game.cache.addTilemap('map', null, data, Phaser.Tilemap.CSV); //creates tilemap i think
-    var map = game.add.tilemap('map', 256, 256); //loads the created tilemap i think
-    map.addTilesetImage('tiles', 'tiles', 256, 256);
-    var layer = map.createLayer(0);
-    layer.resizeWorld();
-    //ok map stuff ends
+    //tiled map stuff here
+    map = game.add.tilemap('map');
+    map.addTilesetImage('background', 'tiles');
+    map.addTilesetImage('greenWall', 'greenWall');
+    groundLayer = map.createLayer('Ground Layer');
+    wallLayer = map.createLayer('Wall Layer');
+    //objectLayer = map.createLayer('Object Layer')
+    map.setCollisionByExclusion([], true, wallLayer);
+    //groundLayer.resizeWorld()
+    wallLayer.resizeWorld();
+    //tiled map stuff ends
     player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy'); //load player sprite in random location
     game.physics.arcade.enable(player); //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true; //collides with edge of the world
@@ -68,6 +57,8 @@ function create() {
     shotgunSpread = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }]; //for firemany()
 }
 function update() {
+    //collision between player and walls
+    game.physics.arcade.collide(player, wallLayer);
     if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
         player.x -= moveSpeed * game.time.physicsElapsed;
     }
@@ -102,8 +93,5 @@ function render() {
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300);
     game.debug.spriteInfo(player, 32, 600);
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
-}
-function onSocketConnected() {
-    console.log('connected to server (game.ts)');
 }
 //# sourceMappingURL=game.js.map
