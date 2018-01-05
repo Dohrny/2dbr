@@ -1,7 +1,11 @@
+//import { Pistol } from "./pistol";
+/// // <reference path='pistol.ts' />
+var socket = io.connect();
 var game = new Phaser.Game(720, 720, Phaser.AUTO, 'game', {
     preload: preload, create: create, update: update,
     render: render
 });
+//export { game }
 function preload() {
     game.load.image('guy', '/assets/player.png');
     game.load.image('bullet', '/assets/bullet.png');
@@ -17,6 +21,8 @@ var map;
 var ground;
 var layer;
 function create() {
+    //socket.io stuff
+    socket.on('connect', onSocketConnected);
     game.physics.startSystem(Phaser.Physics.ARCADE); //enable physics
     game.time.advancedTiming = true; //so i can show fps in debug
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }; //stops right-click from showing context menu
@@ -96,5 +102,8 @@ function render() {
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300);
     game.debug.spriteInfo(player, 32, 600);
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
+}
+function onSocketConnected() {
+    console.log('connected to server (game.ts)');
 }
 //# sourceMappingURL=game.js.map
