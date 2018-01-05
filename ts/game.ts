@@ -1,5 +1,5 @@
 import { Sprite, Group, Weapon, Pointer, Tilemap, Tileset,
-     TilemapLayer, Time, Game, PluginManager, Input, Mouse } from "phaser-ce";
+     TilemapLayer, Time, Game, PluginManager, Input, Mouse, Bullet } from "phaser-ce";
 
 var game = new Phaser.Game(720, 720, Phaser.AUTO, 'game', {
     preload: preload, create: create, update: update,
@@ -31,23 +31,26 @@ function create() {
     game.time.advancedTiming = true //so i can show fps in debug
     game.canvas.oncontextmenu = function (e) { e.preventDefault() } //stops right-click from showing context menu
 
-    //tiled map stuff here //does not work yet
+    //tiled map stuff here //collision does not work yet
     map = game.add.tilemap('map')
     map.addTilesetImage('background', 'tiles')
     map.addTilesetImage('greenWall', 'greenWall')
-    groundLayer = map.createLayer('Ground Layer')
-    wallLayer = map.createLayer('Wall Layer')
-    //objectLayer = map.createLayer('Object Layer')
+    groundLayer = map.createLayer('Ground')
+    wallLayer = map.createLayer('Wall')
+    //objectLayer = map.createLayer('Object')
     map.setCollisionByExclusion([], true, wallLayer)
+    //map.setCollisionByExclusion([], true, objectLayer)
     //groundLayer.resizeWorld()
     wallLayer.resizeWorld()
+    //objectLayer.resizeWorld()
     //tiled map stuff ends
 
     player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
     game.physics.arcade.enable(player) //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true //collides with edge of the world
     player.anchor.set(0.5) //mouse aim is now from center of sprite, instead of 0,0
-
+    player.maxHealth = 100
+    player.health = 100
     game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, .1, .1) //camera follows the player
 
     pistol = game.add.weapon(10, 'bullet')
@@ -64,27 +67,32 @@ function create() {
     shotgun.bulletSpeedVariance = 100 //each bullet moves at different speed
     shotgun.bulletAngleVariance = 20 //helps create "spread"
     shotgun.fireRate = 500
-    //shotgun.fireLimit = 6s
+    //shotgun.fireLimit = 6
     shotgun.trackSprite(player, .5, .5, true) //locks weapon to player sprite
     shotgunSpread = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }] //for firemany()
 
 }
 
 function update() {
-    //collision between player and walls
-    game.physics.arcade.collide(player, wallLayer)
+    //collision between player and walls and bullets
+    game.physics.arcade.collide(wallLayer, player)
+    game.physics.arcade.collide(pistol.bullets, wallLayer, function(bullet, wall){bullet.kill()})
+    game.physics.arcade.collide(shotgun.bullets, wallLayer, function(bullet, wall){bullet.kill()})
 
+
+    player.body.velocity.x = 0
+    player.body.velocity.y = 0
     if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-        player.x -= moveSpeed * game.time.physicsElapsed
+        player.body.velocity.x = -moveSpeed// * game.time.physicsElapsed
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-        player.x += moveSpeed * game.time.physicsElapsed
+        player.body.velocity.x = moveSpeed// * game.time.physicsElapsed
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-        player.y += moveSpeed * game.time.physicsElapsed
+        player.body.velocity.y = moveSpeed// * game.time.physicsElapsed
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-        player.y -= moveSpeed * game.time.physicsElapsed
+        player.body.velocity.y = -moveSpeed// * game.time.physicsElapsed
     }
     player.rotation = game.physics.arcade.angleToPointer(player) //player sprite rotates towards mouse pointer
 
@@ -97,17 +105,17 @@ function update() {
         }
     }
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.Z)) {
+    if (game.input.keyboard.isDown(Phaser.Keyboard.ONE)) {
         equippedWeapon = 'pistol'
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.X)) {
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.TWO)) {
         equippedWeapon = 'shotgun'
     }
 }
 
 function render() {
     //pistol.debug()
-    game.debug.text('shots: ' + shotgun.shots.toString(), 10, 50)
+    game.debug.text('hp: ' + player.health, 10, 50)
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300)
-    game.debug.spriteInfo(player, 32, 600)
+    game.debug.body(player, '#f11', false)
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20)
 }
