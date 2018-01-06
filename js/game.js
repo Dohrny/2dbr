@@ -23,26 +23,8 @@ function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE); //enable physics
     game.time.advancedTiming = true; //so i can show fps in debug
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }; //stops right-click from showing context menu
-    //tiled map stuff here //collision does not work yet
-    map = game.add.tilemap('map');
-    map.addTilesetImage('background', 'tiles');
-    map.addTilesetImage('greenWall', 'greenWall');
-    groundLayer = map.createLayer('Ground');
-    wallLayer = map.createLayer('Wall');
-    //objectLayer = map.createLayer('Object')
-    map.setCollisionByExclusion([], true, wallLayer);
-    //map.setCollisionByExclusion([], true, objectLayer)
-    //groundLayer.resizeWorld()
-    wallLayer.resizeWorld();
-    //objectLayer.resizeWorld()
-    //tiled map stuff ends
-    player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy'); //load player sprite in random location
-    game.physics.arcade.enable(player); //give physics to player (for hitting walls)
-    player.body.collideWorldBounds = true; //collides with edge of the world
-    player.anchor.set(0.5); //mouse aim is now from center of sprite, instead of 0,0
-    player.maxHealth = 100;
-    player.health = 100;
-    game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, .1, .1); //camera follows the player
+    initTilemap(); //setup tilemap and its layers
+    initPlayer(); //setup player and player attributes
     pistol = game.add.weapon(10, 'bullet');
     pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE;
     pistol.bulletKillDistance = 720;
@@ -65,21 +47,58 @@ function update() {
     game.physics.arcade.collide(wallLayer, player);
     game.physics.arcade.collide(pistol.bullets, wallLayer, function (bullet, wall) { bullet.kill(); });
     game.physics.arcade.collide(shotgun.bullets, wallLayer, function (bullet, wall) { bullet.kill(); });
+    handlePlayerInput(); //ya know...handle it
+}
+function render() {
+    //pistol.debug()
+    game.debug.text('hp: ' + player.health, 10, 50);
+    game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300);
+    //game.debug.body(player, '#f11', false)
+    game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
+}
+//functions down here-----------------------------------
+function initTilemap() {
+    //tiled map stuff here...
+    map = game.add.tilemap('map');
+    map.addTilesetImage('background', 'tiles');
+    map.addTilesetImage('greenWall', 'greenWall');
+    groundLayer = map.createLayer('Ground');
+    wallLayer = map.createLayer('Wall');
+    //objectLayer = map.createLayer('Object')
+    map.setCollisionByExclusion([], true, wallLayer);
+    //map.setCollisionByExclusion([], true, objectLayer)
+    //groundLayer.resizeWorld()
+    wallLayer.resizeWorld();
+    //objectLayer.resizeWorld()
+    //tiled map stuff ends
+}
+function initPlayer() {
+    player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy'); //load player sprite in random location
+    game.physics.arcade.enable(player); //give physics to player (for hitting walls)
+    player.body.collideWorldBounds = true; //collides with edge of the world
+    player.anchor.set(0.5); //mouse aim is now from center of sprite, instead of 0,0
+    player.maxHealth = 100;
+    player.health = 100;
+    game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, .1, .1); //camera follows the player
+}
+function handlePlayerInput() {
+    //movement stuff
     player.body.velocity.x = 0;
     player.body.velocity.y = 0;
     if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-        player.body.velocity.x = -moveSpeed; // * game.time.physicsElapsed
+        player.body.velocity.x = -moveSpeed; // * game.time.physicsElapsedMS
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-        player.body.velocity.x = moveSpeed; // * game.time.physicsElapsed
+        player.body.velocity.x = moveSpeed; // * game.time.physicsElapsedMS
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-        player.body.velocity.y = moveSpeed; // * game.time.physicsElapsed
+        player.body.velocity.y = moveSpeed; // * game.time.physicsElapsedMS
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-        player.body.velocity.y = -moveSpeed; // * game.time.physicsElapsed
+        player.body.velocity.y = -moveSpeed; // * game.time.physicsElapsedMS
     }
     player.rotation = game.physics.arcade.angleToPointer(player); //player sprite rotates towards mouse pointer
+    //fire weapon...fix holding down mouse button
     if (game.input.activePointer.leftButton.isDown) {
         if (equippedWeapon == 'pistol') {
             pistol.fire();
@@ -88,18 +107,12 @@ function update() {
             shotgun.fireMany(shotgunSpread);
         }
     }
+    //equip weapon
     if (game.input.keyboard.isDown(Phaser.Keyboard.ONE)) {
         equippedWeapon = 'pistol';
     }
     else if (game.input.keyboard.isDown(Phaser.Keyboard.TWO)) {
         equippedWeapon = 'shotgun';
     }
-}
-function render() {
-    //pistol.debug()
-    game.debug.text('hp: ' + player.health, 10, 50);
-    game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300);
-    game.debug.body(player, '#f11', false);
-    game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
 }
 //# sourceMappingURL=game.js.map
