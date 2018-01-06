@@ -31,7 +31,7 @@ function create() {
     game.time.advancedTiming = true //so i can show fps in debug
     game.canvas.oncontextmenu = function (e) { e.preventDefault() } //stops right-click from showing context menu
 
-    //tiled map stuff here //collision does not work yet
+    //tiled map stuff here
     map = game.add.tilemap('map')
     map.addTilesetImage('background', 'tiles')
     map.addTilesetImage('greenWall', 'greenWall')
