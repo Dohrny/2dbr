@@ -2,7 +2,6 @@ import { Sprite, Group, Weapon, Pointer, Tilemap, Tileset,
      TilemapLayer, Time, Game, PluginManager, Input, Mouse, Bullet, Canvas, ScaleManager } from "phaser-ce";
 
 var game = new Phaser.Game(
-    //window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio,
     800, 600,
      Phaser.AUTO, 'game', {
     preload: preload, 
@@ -31,12 +30,12 @@ var wallLayer: TilemapLayer
 var objectLayer: TilemapLayer
 
 function create() {
-    //note about game scaling. if the game starts in a browser window smaller than
-    //the minimum game size minus margin adjust(20px right now) (680 x 500 total right now), the 
-    //adjustScreenDimensions function wont work properly on screen resize.
+    /*note about game scaling. when you resize the game, it will only stay in the correct
+    aspect ratio if you keep the browser window the same, or smaller, size. if you try
+    to make the window larger after starting the game, it will not scale properly, if at all*/
     game.scale.scaleMode =  Phaser.ScaleManager.SHOW_ALL //show_all keeps aspect ratio on resize
-    game.scale.setMinMax(640, 480, window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio)//set min and max dimensions for game window
-    adjustScreenDimensions() //call right away so game screen fits in windows (note: could remove body margin)
+    game.scale.setMinMax(640, 480, window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio)//set min and max dimensions for game window. pixelratio is 1 on my comp...
+    adjustScreenDimensions() //call right away so game screen fits in windows (note: could remove body margin//did and it did nothing)
     window.addEventListener('resize', function () { adjustScreenDimensions()})
     game.canvas.oncontextmenu = function (e) { e.preventDefault() } //stops right-click from showing context menu
 
@@ -85,7 +84,9 @@ function render() {
     //pistol.debug()
     game.debug.text('hp: ' + player.health, 10, 50)
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300)
-    game.debug.text(window.innerWidth + ', ' + window.innerHeight, 10, 100)
+    game.debug.text('pixelratio: ' + devicePixelRatio, 10, 130)
+    game.debug.text('aspect ratio: ' + game.scale.aspectRatio, 10, 150)
+    game.debug.text(window.innerWidth * devicePixelRatio + ', ' + window.innerHeight * devicePixelRatio, 10, 100)
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20)
 }
 
@@ -94,8 +95,8 @@ function render() {
 //helps make the game fit within browser window
 function adjustScreenDimensions() {
     var divGame = document.getElementById('game')
-    divGame.style.width = window.innerWidth - 20 + 'px' //-20 is to add white space
-    divGame.style.height = window.innerHeight - 20 + 'px' //-20 is to add white space
+    divGame.style.width = window.innerWidth - 30 + 'px' //-20 is to add white space
+    divGame.style.height = window.innerHeight - 30 + 'px' //-20 is to add white space
 }
 
 function initTilemap() {

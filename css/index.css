@@ -1,8 +1,8 @@
 body {
     background-color: lightgray;
+    margin: 0;
 }
 
 #game {
-    display: block;
     margin: auto;
 }
