@@ -22,14 +22,13 @@ var groundLayer;
 var wallLayer;
 var objectLayer;
 function create() {
-    /*note about game scaling. when you resize the game, it will only stay in the correct
-    aspect ratio if you keep the browser window the same, or smaller, size. if you try
-    to make the window larger after starting the game, it will not scale properly, if at all*/
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; //show_all keeps aspect ratio on resize
-    game.scale.setMinMax(640, 480, window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio); //set min and max dimensions for game window. pixelratio is 1 on my comp...
-    adjustScreenDimensions(); //call right away so game screen fits in windows (note: could remove body margin//did and it did nothing)
+    //set min and max dimensions for game window. pixelratio is 1 on my comp...
+    game.scale.setMinMax(640, 480, window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio);
+    adjustScreenDimensions(); //call right away so game screen fits in windows
     window.addEventListener('resize', function () { adjustScreenDimensions(); });
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }; //stops right-click from showing context menu
+    //game.scale.pageAlignHorizontally = true
     game.physics.startSystem(Phaser.Physics.ARCADE); //enable physics
     game.time.advancedTiming = true; //so i can show fps in debug
     initTilemap(); //setup tilemap and its layers
@@ -60,11 +59,11 @@ function update() {
 }
 function render() {
     //pistol.debug()
-    game.debug.text('hp: ' + player.health, 10, 50);
+    game.debug.text('hp: ' + player.health, 10, 350);
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300);
     game.debug.text('pixelratio: ' + devicePixelRatio, 10, 130);
-    game.debug.text('aspect ratio: ' + game.scale.aspectRatio, 10, 150);
-    game.debug.text(window.innerWidth * devicePixelRatio + ', ' + window.innerHeight * devicePixelRatio, 10, 100);
+    game.debug.text('aspect ratio: ' + game.scale.aspectRatio.toFixed(2), 10, 150);
+    //game.debug.text('scale factor: ' + game.scale.scaleFactorInversed, 10, 170)
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
 }
 //functions down here-----------------------------------
@@ -73,6 +72,8 @@ function adjustScreenDimensions() {
     var divGame = document.getElementById('game');
     divGame.style.width = window.innerWidth - 30 + 'px'; //-20 is to add white space
     divGame.style.height = window.innerHeight - 30 + 'px'; //-20 is to add white space
+    //have to do this here so i can make screens bigger than how they started
+    game.scale.setMinMax(640, 480, window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio);
 }
 function initTilemap() {
     //tiled map stuff here...
