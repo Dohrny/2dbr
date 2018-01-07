@@ -1,10 +1,15 @@
 import { Sprite, Group, Weapon, Pointer, Tilemap, Tileset,
-     TilemapLayer, Time, Game, PluginManager, Input, Mouse, Bullet } from "phaser-ce";
+     TilemapLayer, Time, Game, PluginManager, Input, Mouse, Bullet, Canvas, ScaleManager } from "phaser-ce";
 
-var game = new Phaser.Game(720, 720, Phaser.AUTO, 'game', {
-    preload: preload, create: create, update: update,
+var game = new Phaser.Game(
+    //window.innerWidth * window.devicePixelRatio, window.innerHeight * window.devicePixelRatio,
+    800, 600,
+     Phaser.AUTO, 'game', {
+    preload: preload, 
+    create: create, 
+    update: update,
     render: render
-})  
+})
 
 function preload() {
     game.load.image('guy', '/assets/player.png')
@@ -15,7 +20,7 @@ function preload() {
 }
 
 var player: Sprite
-var moveSpeed: number = 180
+var moveSpeed: number = 150
 var pistol: Weapon
 var shotgun: Weapon
 var shotgunSpread: Array<Object>
@@ -26,10 +31,19 @@ var wallLayer: TilemapLayer
 var objectLayer: TilemapLayer
 
 function create() {
+    //note about game scaling. if the game starts in a browser window smaller than
+    //the minimum game size minus margin adjust(20px right now) (680 x 500 total right now), the 
+    //adjustScreenDimensions function wont work properly on screen resize.
+    game.scale.scaleMode =  Phaser.ScaleManager.SHOW_ALL //show_all keeps aspect ratio on resize
+    game.scale.setMinMax(640, 480, window.innerWidth * devicePixelRatio, window.innerHeight * devicePixelRatio)//set min and max dimensions for game window
+    adjustScreenDimensions() //call right away so game screen fits in windows (note: could remove body margin)
+    window.addEventListener('resize', function () { adjustScreenDimensions()})
+    game.canvas.oncontextmenu = function (e) { e.preventDefault() } //stops right-click from showing context menu
+
 
     game.physics.startSystem(Phaser.Physics.ARCADE) //enable physics
     game.time.advancedTiming = true //so i can show fps in debug
-    game.canvas.oncontextmenu = function (e) { e.preventDefault() } //stops right-click from showing context menu
+
 
     initTilemap()//setup tilemap and its layers
     
@@ -71,11 +85,18 @@ function render() {
     //pistol.debug()
     game.debug.text('hp: ' + player.health, 10, 50)
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300)
-    //game.debug.body(player, '#f11', false)
+    game.debug.text(window.innerWidth + ', ' + window.innerHeight, 10, 100)
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20)
 }
 
 //functions down here-----------------------------------
+
+//helps make the game fit within browser window
+function adjustScreenDimensions() {
+    var divGame = document.getElementById('game')
+    divGame.style.width = window.innerWidth - 20 + 'px' //-20 is to add white space
+    divGame.style.height = window.innerHeight - 20 + 'px' //-20 is to add white space
+}
 
 function initTilemap() {
     //tiled map stuff here...
@@ -94,7 +115,9 @@ function initTilemap() {
 }
 
 function initPlayer() {
-    player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
+    player = game.add.sprite(50, 50, 'guy') //load player sprite in random location
+
+    //player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
     game.physics.arcade.enable(player) //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true //collides with edge of the world
     player.anchor.set(0.5) //mouse aim is now from center of sprite, instead of 0,0
