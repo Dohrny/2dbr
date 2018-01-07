@@ -87,7 +87,6 @@ function render() {
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300)
     game.debug.text('pixelratio: ' + devicePixelRatio, 10, 130)
     game.debug.text('aspect ratio: ' + game.scale.aspectRatio.toFixed(2), 10, 150)
-    //game.debug.text('scale factor: ' + game.scale.scaleFactorInversed, 10, 170)
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20)
 }
 
