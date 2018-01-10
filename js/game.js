@@ -5,7 +5,8 @@ var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', {
     render: render
 });
 function preload() {
-    game.load.image('guy', '/assets/player.png');
+    game.load.image('guy', '/assets/player.png'); //square player
+    game.load.image('player', '/assets/player_v2.png'); //circular player
     game.load.image('bullet', '/assets/bullet.png');
     game.load.tilemap('map', '/assets/tilemaps/map.json', null, Phaser.Tilemap.TILED_JSON);
     game.load.image('tiles', '/assets/tilemaps/tiles/background.png');
@@ -28,7 +29,7 @@ function create() {
     adjustScreenDimensions(); //call right away so game screen fits in windows
     window.addEventListener('resize', function () { adjustScreenDimensions(); });
     game.canvas.oncontextmenu = function (e) { e.preventDefault(); }; //stops right-click from showing context menu
-    //game.scale.pageAlignHorizontally = true
+    //game.scale.pageAlignHorizontally = true //align game screen in center of page
     game.physics.startSystem(Phaser.Physics.ARCADE); //enable physics
     game.time.advancedTiming = true; //so i can show fps in debug
     initTilemap(); //setup tilemap and its layers
@@ -38,7 +39,7 @@ function create() {
     pistol.bulletKillDistance = 720;
     pistol.bulletSpeed = 500;
     pistol.fireRate = 250;
-    pistol.trackSprite(player, .5, .5, true);
+    pistol.trackSprite(player, 0, 0, true);
     shotgun = game.add.weapon(20, 'bullet');
     shotgun.bulletKillType = Phaser.Weapon.KILL_DISTANCE; //needed for bulletkilldistance
     shotgun.bulletKillDistance = 200;
@@ -55,8 +56,10 @@ function update() {
     game.physics.arcade.collide(wallLayer, player);
     game.physics.arcade.collide(pistol.bullets, wallLayer, function (bullet, wall) { bullet.kill(); });
     game.physics.arcade.collide(shotgun.bullets, wallLayer, function (bullet, wall) { bullet.kill(); });
+    game.physics.arcade.overlap(player, pistol.bullets, hitEnemy); //as of now only hits player
     handlePlayerInput(); //ya know...handle it
 }
+//mostly using for debug stuff
 function render() {
     //pistol.debug()
     game.debug.text('hp: ' + player.health, 10, 350);
@@ -64,6 +67,7 @@ function render() {
     game.debug.text('pixelratio: ' + devicePixelRatio, 10, 130);
     game.debug.text('aspect ratio: ' + game.scale.aspectRatio.toFixed(2), 10, 150);
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
+    //game.debug.body(player, '#a11', true)
 }
 //functions down here-----------------------------------
 //helps make the game fit within browser window
@@ -90,10 +94,13 @@ function initTilemap() {
     //tiled map stuff ends
 }
 function initPlayer() {
-    player = game.add.sprite(50, 50, 'guy'); //load player sprite in random location
+    player = game.add.sprite(50, 50, 'guy'); //load player sprite (square player)
+    //player = game.add.sprite(50, 50, 'player') //load circular player sprite
     //player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
     game.physics.arcade.enable(player); //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true; //collides with edge of the world
+    player.body.isCircle = true;
+    player.body.radius = 10;
     player.anchor.set(0.5); //mouse aim is now from center of sprite, instead of 0,0
     player.maxHealth = 100;
     player.health = 100;
@@ -131,6 +138,12 @@ function handlePlayerInput() {
     }
     else if (game.input.keyboard.isDown(Phaser.Keyboard.TWO)) {
         equippedWeapon = 'shotgun';
+    }
+}
+function hitEnemy(enemy, bullet) {
+    if (enemy != player) {
+        enemy.damage(5);
+        bullet.kill();
     }
 }
 //# sourceMappingURL=game.js.map
