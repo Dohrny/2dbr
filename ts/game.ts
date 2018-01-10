@@ -54,21 +54,22 @@ function create() {
 
     pistol = game.add.weapon(10, 'bullet')
     pistol.bulletKillType = Phaser.Weapon.KILL_DISTANCE
-    pistol.bulletKillDistance = 720
+    pistol.bulletKillDistance = 700
     pistol.bulletSpeed = 500
     pistol.fireRate = 250
     pistol.trackSprite(player, 0, 0, true)
 
     shotgun = game.add.weapon(20, 'bullet')
     shotgun.bulletKillType = Phaser.Weapon.KILL_DISTANCE //needed for bulletkilldistance
-    shotgun.bulletKillDistance = 200
+    shotgun.bulletKillDistance = 160
     shotgun.bulletSpeed = 1000
     shotgun.bulletSpeedVariance = 100 //each bullet moves at different speed
     shotgun.bulletAngleVariance = 20 //helps create "spread"
     shotgun.fireRate = 500
     //shotgun.fireLimit = 6
-    shotgun.trackSprite(player, .5, .5, true) //locks weapon to player sprite
-    shotgunSpread = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }] //for firemany()
+    shotgun.trackSprite(player, 15, 0, true) //locks weapon to player sprite
+    shotgunSpread = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 },
+    { x: 0, y: 0 }, { x: 0, y: 0 }] //for firemany()
 
 }
 
@@ -77,7 +78,7 @@ function update() {
     game.physics.arcade.collide(wallLayer, player)
     game.physics.arcade.collide(pistol.bullets, wallLayer, function(bullet, wall){bullet.kill()})
     game.physics.arcade.collide(shotgun.bullets, wallLayer, function(bullet, wall){bullet.kill()})
-    game.physics.arcade.overlap(player, pistol.bullets, hitEnemy) //as of now only hits player
+    game.physics.arcade.overlap(player, pistol.bullets, damageTarget) //as of now only hits player
 
     handlePlayerInput() //ya know...handle it
     
@@ -176,7 +177,7 @@ function handlePlayerInput() {
 }
 
 
-function hitEnemy(enemy, bullet) {
+function damageTarget(enemy, bullet) {
     if(enemy != player){
         enemy.damage(5)
         bullet.kill()
