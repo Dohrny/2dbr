@@ -1,7 +1,7 @@
 const express = require('express')
 const app = module.exports = express()
-//var server = require('http').Server(app)
-//var io = require('socket.io')(server)
+var server = require('http').Server(app)
+var io = require('socket.io')(server)
 const path = require('path')
 
 
@@ -12,17 +12,16 @@ app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/css', express.static(__dirname + '/css'))
 
 app.get('/', (req,res) => {
-    //res.sendFile(__dirname+'/index.html');
-    res.send('hi from 2dbr')
+    res.sendFile(__dirname+'/index.html');
 });
 
-// io.on('connection', function(socket) {
-//     console.log('user connected...id: ' + socket.id)
-//     socket.on('disconnect', function() {
-//         console.log('user disconnected')
-//     })
-// })
+io.on('connection', function(socket) {
+    console.log('user connected...id: ' + socket.id)
+    socket.on('disconnect', function() {
+        console.log('user disconnected')
+    })
+})
 
-// server.listen(8081,function(){ // Listens to port 8081
-//     console.log('Listening on ' + server.address().port);
-// })
+server.listen(8081,function(){ // Listens to port 8081
+    console.log('Listening on ' + server.address().port);
+})
