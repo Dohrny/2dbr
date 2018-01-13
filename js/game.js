@@ -13,7 +13,7 @@ function preload() {
     game.load.image('greenWall', '/assets/tilemaps/tiles/greenWall.png');
 }
 var player;
-var moveSpeed = 150;
+var moveSpeed = 7.5;
 var pistol;
 var shotgun;
 var shotgunSpread;
@@ -66,7 +66,7 @@ function render() {
     game.debug.text('hp: ' + player.health, 10, 350);
     game.debug.text('equipped weapon: ' + equippedWeapon, 10, 300);
     game.debug.text('pixelratio: ' + devicePixelRatio, 10, 130);
-    game.debug.text('aspect ratio: ' + game.scale.aspectRatio.toFixed(2), 10, 150);
+    game.debug.text(player.body.velocity, 10, 150);
     game.debug.text('fps: ' + game.time.fps, game.width - 100, 20);
     //game.debug.body(player, '#a11', true)
 }
@@ -100,7 +100,7 @@ function initPlayer() {
     //player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
     game.physics.arcade.enable(player); //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true; //collides with edge of the world
-    player.body.isCircle = true;
+    //player.body.isCircle = true
     player.body.radius = 10;
     player.anchor.set(0.5); //mouse aim is now from center of sprite, instead of 0,0
     player.maxHealth = 100;
@@ -108,21 +108,26 @@ function initPlayer() {
     game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, .1, .1); //camera follows the player
 }
 function handlePlayerInput() {
-    //movement stuff
+    //-----movement stuff-----
     player.body.velocity.x = 0;
     player.body.velocity.y = 0;
+    //number on right doesnt really matter cuz it will be normalized to '1'
     if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-        player.body.velocity.x = -moveSpeed; // * game.time.physicsElapsedMS
+        player.body.velocity.x += -1;
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-        player.body.velocity.x = moveSpeed; // * game.time.physicsElapsedMS
-    }
-    if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-        player.body.velocity.y = moveSpeed; // * game.time.physicsElapsedMS
+        player.body.velocity.x += 1;
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-        player.body.velocity.y = -moveSpeed; // * game.time.physicsElapsedMS
+        player.body.velocity.y += -1;
     }
+    if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+        player.body.velocity.y += 1;
+    }
+    //normalize velocity so it doesnt move faster at a diagonal
+    player.body.velocity.normalize();
+    player.body.velocity.x *= moveSpeed * game.time.physicsElapsedMS;
+    player.body.velocity.y *= moveSpeed * game.time.physicsElapsedMS;
     player.rotation = game.physics.arcade.angleToPointer(player); //player sprite rotates towards mouse pointer
     //fire weapon...fix holding down mouse button
     if (game.input.activePointer.leftButton.isDown) {
