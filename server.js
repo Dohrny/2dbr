@@ -4,7 +4,7 @@ var server = require('http').Server(app)
 var io = require('socket.io')(server)
 const path = require('path')
 
-
+app.set('view engine', 'pug')
 //app.use('/css',express.static(__dirname + '/css'));
 //app.set('views', express.static(__dirname))
 app.use('/js',express.static(__dirname + '/js'));
@@ -12,7 +12,7 @@ app.use('/assets',express.static(__dirname + '/assets'));
 app.use('/css', express.static(__dirname + '/css'))
 
 app.get('/', (req,res) => {
-    res.sendFile(__dirname+'/index.html');
+    res.sendFile(__dirname+'/views/index.html');
 });
 
 io.on('connection', function(socket) {
