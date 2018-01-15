@@ -127,12 +127,11 @@ function initTilemap() {
 function initPlayer() {
     player = game.add.sprite(50, 50, 'guy') //load player sprite (square player)
     //player = game.add.sprite(50, 50, 'player') //load circular player sprite
-
     //player = game.add.sprite(game.rnd.between(50, 1200), game.rnd.between(50, 1200), 'guy') //load player sprite in random location
     game.physics.arcade.enable(player) //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true //collides with edge of the world
     //player.body.isCircle = true
-    player.body.radius = 10
+    //player.body.radius = 10
     player.anchor.set(0.5) //mouse aim is now from center of sprite, instead of 0,0
     player.maxHealth = 100
     player.health = 100

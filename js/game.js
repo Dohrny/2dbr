@@ -101,7 +101,7 @@ function initPlayer() {
     game.physics.arcade.enable(player); //give physics to player (for hitting walls)
     player.body.collideWorldBounds = true; //collides with edge of the world
     //player.body.isCircle = true
-    player.body.radius = 10;
+    //player.body.radius = 10
     player.anchor.set(0.5); //mouse aim is now from center of sprite, instead of 0,0
     player.maxHealth = 100;
     player.health = 100;
