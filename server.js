@@ -65,7 +65,14 @@ io.on('connection', function(socket) {
     })
 
     socket.on('player update', function(data) {
-        socket.broadcast.emit('player update', data.x, data.y, data.r)
+        var current_info = {
+            id: this.id,
+            x: data.x,
+            y: data.y,
+            r: data.r
+        }
+        socket.broadcast.emit('player update', current_info)
+        //console.log('data id: ' + data.x)
     })    
 })
 
