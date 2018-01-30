@@ -1,7 +1,7 @@
 const express = require('express')
 const app = module.exports = express()
 var server = require('http').Server(app)
-var io = require('socket.io').listen(server)
+var io = require('socket.io')(server)
 const path = require('path')
 
 var playerList = []
@@ -77,10 +77,10 @@ io.on('connection', function(socket) {
 })
 
 //send message to client every 3s
-// setInterval(function() {
-//     io.emit('test', 'test words')
-//     console.log('sending test')
-// }, 10000)
+setInterval(function() {
+    io.emit('test', 'test words')
+    console.log('sending test')
+}, 10000)
 
 function onClientDisconnect() {
     var removePlayer = findPlayerID(this.id)
@@ -100,8 +100,7 @@ function findPlayerID(id) {
     return false
 }
 
-// server.listen(8081,function(){ // Listens to port 8081
-//     console.log('Listening on ' + server.address().port);
-// })
+server.listen(8081,function(){ // Listens to port 8081
+    console.log('Listening on ' + server.address().port);
+})
 
-//console.log('server listening on: ' + server.address().port)
