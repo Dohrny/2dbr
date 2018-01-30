@@ -30,6 +30,19 @@ var groundLayer: TilemapLayer
 var wallLayer: TilemapLayer
 var objectLayer: TilemapLayer
 
+var socket
+var enemies = []
+var remote_player = function (id, startX, startY, startR) {
+    this.x = startX
+    this.y = startY
+    this.r = startR
+    this.id = id
+
+    this.player = game.add.sprite(100, 100, 'guy')
+    this.player.anchor.set(0.5)
+    //game.physics.enable(this.player)
+}
+
 function create() {
     game.scale.scaleMode =  Phaser.ScaleManager.SHOW_ALL //show_all keeps aspect ratio on resize
     
@@ -71,6 +84,19 @@ function create() {
     shotgunSpread = [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 },
     { x: 0, y: 0 }, { x: 0, y: 0 }] //for firemany()
 
+    socket = io.connect()
+    socket.on('connection', function() {
+        console.log('client connected i think')
+    })
+    socket.on('test', function(msg) {
+        console.log('recieved: ' + msg)
+    })
+
+    socket.emit('new player',{x: player.x, y: player.y, r: player.rotation})
+    socket.on('new_enemyPlayer', onNewPlayer)
+    socket.on('remove player', onRemovePlayer)
+    socket.on('player update', onEnemyUpdate)
+
 }
 
 function update() {
@@ -81,6 +107,8 @@ function update() {
     game.physics.arcade.overlap(player, pistol.bullets, damageTarget) //as of now only hits player
 
     handlePlayerInput() //ya know...handle it
+    sendPlayerUpdate()
+    
     
 }
 
@@ -137,6 +165,17 @@ function initPlayer() {
     player.health = 100
     game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, .1, .1) //camera follows the player
 
+    
+
+}
+
+function onNewPlayer(data) {
+    console.log(data)
+    var enemy = new remote_player(data.id, data.x, data.y, data.r)
+    enemies.push(enemy)
+}
+function onRemovePlayer(data) {
+    
 }
 
 function handlePlayerInput() {
@@ -182,6 +221,30 @@ function handlePlayerInput() {
         equippedWeapon = 'pistol'
     } else if (game.input.keyboard.isDown(Phaser.Keyboard.TWO)) {
         equippedWeapon = 'shotgun'
+    }
+    
+}
+
+function sendPlayerUpdate() {
+    socket.emit('player update', {x: player.x, y: player.y, r: player.rotation})
+}
+
+function onEnemyUpdate(data) {
+    //console.log(data)
+    var movePlayer = findEnemyById(data.id)
+    //console.log(movePlayer.r)
+    movePlayer.player.x = data.x
+    movePlayer.player.y = data.y
+    movePlayer.player.rotation = data.r
+}
+
+//This is where we use the socket id. 
+//Search through enemies list to find the right enemy of the id.
+function findEnemyById(id) {
+    for (let i = 0; i < enemies.length; i++) {
+        if (enemies[i].id == id) {
+            return enemies[i]
+        }
     }
 }
 
