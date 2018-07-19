@@ -175,7 +175,9 @@ function onNewPlayer(data) {
     enemies.push(enemy)
 }
 function onRemovePlayer(data) {
-    
+    var enemy = findEnemyById(data.id)
+    enemies.splice(enemy)
+    console.log('num of ppl: ' + enemies.length)
 }
 
 function handlePlayerInput() {
