@@ -78,7 +78,7 @@ io.on('connection', function(socket) {
 
 //send message to client every 3s
 setInterval(function() {
-    io.emit('test', 'test words')
+    io.emit('test', 'test words...test')
     console.log('sending test')
 }, 10000)
 
