@@ -1,4 +1,5 @@
-# 2dbr
+# 2dbr  
+right now these are just notes for myself  
 
 git pull origin master: to update local files  
 
